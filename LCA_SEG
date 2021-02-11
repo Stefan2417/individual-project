@@ -1,0 +1,41 @@
+const int N = 100005;
+vector<int> g[N], el;
+int fst[N], h[N];
+pair<int, int> tr[8 * N];
+
+void dfs(int v, int p, int hh) {
+    fst[v] = el.size();
+    h[v] = hh;
+    el.push_back(v);
+    for (auto &i : g[v])
+        if (i != p) {
+            dfs(i, v, hh + 1);
+            el.push_back(v);
+        }
+}
+
+void build(int v = 0, int L = 0, int R = el.size()) {
+    if (R - L == 1) {
+        tr[v] = {h[el[L]], el[L]};
+        return;
+    }
+    int M = (L + R) / 2;
+    build(v * 2 + 1, L, M);
+    build(v * 2 + 2, M, R);
+    tr[v] = min(tr[v * 2 + 1], tr[v * 2 + 2]);
+}
+
+pair<int, int> get(int l, int r, int v = 0, int L = 0, int R = el.size()) {
+    if (l == L && r == R) return tr[v];
+    int M = (L + R) / 2;
+    pair<int, int> ans = {MOD, MOD};
+    if (l < M) ans = min(ans, get(l, min(M, r), v * 2 + 1, L, M));
+    if (M < r) ans = min(ans, get(max(l, M), r, v * 2 + 2, M, R));
+    return ans;
+}
+
+int LCA(int x, int y) {
+    if (fst[x] > fst[y]) swap(x, y);
+    pair<int, int> res = get(fst[x], fst[y] + 1);
+    return res.ss;
+}
