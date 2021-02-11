@@ -1,0 +1,28 @@
+const int N = 100005, LVL = 20;
+int jump[LVL][N];
+int h[N];
+vector<int> g[N];
+
+void dfs(int v, int p, int hh) {
+    jump[0][v] = p;
+    h[v] = hh;
+    for (int lvl = 1; lvl < LVL; lvl++)
+        jump[lvl][v] = jump[lvl - 1][jump[lvl - 1][v]];
+    for (auto &i : g[v])
+        if (i != p)
+            dfs(i, v, hh + 1);
+}
+
+int LCA(int x, int y) {
+    for (int j = LVL - 1; j >= 0; j--)
+        if (h[jump[j][x]] >= h[y]) x = jump[j][x];
+    for (int j = LVL - 1; j >= 0; j--)
+        if (h[jump[j][y]] >= h[x]) y = jump[j][y];
+    if (x == y) return x;
+    for (int j = LVL - 1; j >= 0; j--) {
+        if (jump[j][x] == jump[j][y]) continue;
+        x = jump[j][x];
+        y = jump[j][y];
+    }
+    return jump[0][x];
+}
