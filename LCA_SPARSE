@@ -1,0 +1,36 @@
+const ll N = 100005, lg = 20;
+vector<int> g[N];
+int lvl[2 * N], fst[2 * N];
+pair<int, int> table[lg][2 * N];
+
+vector<int> el;
+
+pair<int, int> comb(pair<int, int> x, pair<int, int> y) {
+    if (x.ff <= y.ff) return x;
+    else return y;
+}
+
+void dfs(int v, int p, int height) {
+    el.pb(v);
+    fst[v] = sz(el) - 1;
+    lvl[v] = height;
+    for (auto i : g[v])
+        if (i != p) {
+            dfs(i, v, height + 1);
+            el.pb(v);
+        }
+}
+
+int lca(int l, int r) {
+    int l2 = min(l, r), r2 = max(l, r);
+    r2++;
+    int q = __lg(r2 - l2);
+    return comb(table[q][l2], table[q][r2 - (1 << q)]).ss;
+}
+
+for (int i = 0; i < sz(el); i++)
+        table[0][i] = make_pair(lvl[el[i]], el[i]);
+for (int q = 0; q < lg - 1; q++)
+    for (int j = 0; j + (1 << q) < el.size(); j++)
+        table[q + 1][j] = comb(table[q][j], table[q][j + (1 << q)]);
+          
